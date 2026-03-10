@@ -19,7 +19,12 @@ def add_student(request):
             course=course,
             age=age
         )
-
+    
         return redirect('student_list')
 
     return render(request, 'students/add.html')
+
+def delete_student(request, id):
+    student = Student.objects.get(id=id)
+    student.delete()
+    return redirect('/')

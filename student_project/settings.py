@@ -81,15 +81,10 @@ WSGI_APPLICATION = 'student_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'defaultdb',
-        'USER': 'avnadmin',
-        'PASSWORD': '',
-        'HOST': 'mysql-3448bcd7-tennetinaveen222-cfc.i.aivencloud.com',
-        'PORT': '14566',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
