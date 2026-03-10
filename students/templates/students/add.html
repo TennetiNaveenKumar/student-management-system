@@ -3,9 +3,14 @@
 <form method="POST">
 {% csrf_token %}
 
-Name: <input type="text" name="name"><br><br>
-Email: <input type="email" name="email"><br><br>
-Course: <input type="text" name="course"><br><br>
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+Name: <input type="text" name="name" value="{{ name|default_if_none:'' }}"><br><br>
+Email: <input type="email" name="email" value="{{ email|default_if_none:'' }}"><br><br>
+Course: <input type="text" name="course" value="{{ course|default_if_none:'' }}"><br><br>
+Age: <input type="number" name="age" value="{{ age|default_if_none:'' }}"><br><br>
 
 <button type="submit">Save</button>
 

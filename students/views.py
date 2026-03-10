@@ -8,10 +8,19 @@ def student_list(request):
 
 def add_student(request):
     if request.method == "POST":
-        name = request.POST['name']
-        email = request.POST['email']
-        course = request.POST['course']
-        age = request.POST['age']
+        # use .get() to avoid MultiValueDictKeyError and validate inputs
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        course = request.POST.get('course')
+        age = request.POST.get('age')
+
+        if not age:
+            # re‑render form with an error message
+            error = "Age is required."
+            return render(request, 'students/add.html', {'error': error,
+                                                          'name': name,
+                                                          'email': email,
+                                                          'course': course})
 
         Student.objects.create(
             name=name,
