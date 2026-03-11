@@ -3,7 +3,7 @@ from .models import Student
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
+from django.contrib.auth.decorators import user_passes_test
 
 # -------------------------
 # LOGIN
@@ -42,36 +42,40 @@ def logout_user(request):
 # -------------------------
 # STUDENT LIST + PAGINATION
 # -------------------------
+
 @login_required
 def student_list(request):
 
-    students = Student.objects.all()
+    search = request.GET.get('search')
 
-    paginator = Paginator(students, 5)   # 5 students per page
+    if search:
+        students = Student.objects.filter(name__icontains=search)
+    else:
+        students = Student.objects.all()
+
+    paginator = Paginator(students, 5)
 
     page_number = request.GET.get('page')
 
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'students/student_list.html', {'page_obj': page_obj})
-
-
+    return render(request, 'student_list.html', {'page_obj': page_obj})
 # -------------------------
 # ADD STUDENT
 # -------------------------
 @login_required
 def add_student(request):
-
     if request.method == "POST":
-
         name = request.POST['name']
         email = request.POST['email']
         course = request.POST['course']
+        photo = request.FILES.get('photo')
 
         Student.objects.create(
             name=name,
             email=email,
-            course=course
+            course=course,
+            photo=photo,
         )
 
         return redirect('/')
@@ -100,14 +104,32 @@ def edit_student(request, id):
     return render(request, 'students/edit_student.html', {'student': student})
 
 
+# helper for admin-only views
+
+def admin_only(user):
+    return user.is_superuser
+
 # -------------------------
 # DELETE STUDENT
 # -------------------------
 @login_required
+@user_passes_test(admin_only)
 def delete_student(request, id):
-
     student = get_object_or_404(Student, id=id)
-
     student.delete()
-
     return redirect('/')
+
+
+@login_required
+def dashboard(request):
+
+    total_students = Student.objects.count()
+
+    total_courses = Student.objects.values('course').distinct().count()
+
+    context = {
+        'total_students': total_students,
+        'total_courses': total_courses
+    }
+
+    return render(request, 'dashboard.html', context)
