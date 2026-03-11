@@ -9,21 +9,24 @@ from django.core.paginator import Paginator
 # LOGIN
 # -------------------------
 def login_user(request):
+    # support ?next=/some/path redirect after login
+    next_url = request.GET.get('next') or request.POST.get('next')
 
+    error = None
     if request.method == "POST":
-
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-
             login(request, user)
+            # redirect to next_url if provided else home
+            return redirect(next_url or '/')
+        else:
+            error = "Invalid username or password."
 
-            return redirect('/')
-
-    return render(request, 'login.html')
+    return render(request, 'students/login.html', {'error': error, 'next': next_url})
 
 
 # -------------------------
@@ -50,7 +53,7 @@ def student_list(request):
 
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'student_list.html', {'page_obj': page_obj})
+    return render(request, 'students/student_list.html', {'page_obj': page_obj})
 
 
 # -------------------------
@@ -73,7 +76,7 @@ def add_student(request):
 
         return redirect('/')
 
-    return render(request, 'add_student.html')
+    return render(request, 'students/add_student.html')
 
 
 # -------------------------
@@ -94,7 +97,7 @@ def edit_student(request, id):
 
         return redirect('/')
 
-    return render(request, 'edit_student.html', {'student': student})
+    return render(request, 'students/edit_student.html', {'student': student})
 
 
 # -------------------------
