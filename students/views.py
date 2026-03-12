@@ -69,12 +69,20 @@ def add_student(request):
         name = request.POST['name']
         email = request.POST['email']
         course = request.POST['course']
+        age = request.POST.get('age')
         photo = request.FILES.get('photo')
+
+        # age is required by the model; convert or default to 0 if missing
+        try:
+            age = int(age)
+        except (TypeError, ValueError):
+            age = 0
 
         Student.objects.create(
             name=name,
             email=email,
             course=course,
+            age=age,
             photo=photo,
         )
 
@@ -96,6 +104,11 @@ def edit_student(request, id):
         student.name = request.POST['name']
         student.email = request.POST['email']
         student.course = request.POST['course']
+        student.age = request.POST.get('age', student.age)
+        # optional photo replacement
+        photo = request.FILES.get('photo')
+        if photo:
+            student.photo = photo
 
         student.save()
 

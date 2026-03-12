@@ -19,6 +19,8 @@ Add Student
 <th>Name</th>
 <th>Email</th>
 <th>Course</th>
+<th>Age</th>
+<th>Photo</th>
 </tr>
 
 {% for student in page_obj %}
@@ -28,6 +30,12 @@ Add Student
 <td>{{student.name}}</td>
 <td>{{student.email}}</td>
 <td>{{student.course}}</td>
+<td>{{student.age}}</td>
+<td>
+    {% if student.photo %}
+        <img src="{{student.photo.url}}" width="40" height="40" />
+    {% endif %}
+</td>
 </tr>
 
 {% endfor %}
