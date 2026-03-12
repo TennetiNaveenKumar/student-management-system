@@ -21,12 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)l+i87s2^8d^*60qc9u7%)7z)br8)jy*wt7dg-9_k!jgo^&(oz'
+# pull values from environment variables so we don't leak them in the repo
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
+    'django-insecure-)l+i87s2^8d^*60qc9u7%)7z)br8)jy*wt7dg-9_k!jgo^&(oz')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# on Render you can set DJANGO_DEBUG to "False"; default is True for development
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# allowhosts should be a comma‑separated list in the env var
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
@@ -77,13 +81,15 @@ WSGI_APPLICATION = 'student_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+# Render (and other hosts) typically provide a DATABASE_URL environment variable
+# we use dj_database_url to parse it, falling back to the local sqlite file.
+import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+    )
 }
 
 # Password validation
